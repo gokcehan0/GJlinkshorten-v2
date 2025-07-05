@@ -17,9 +17,20 @@ const register = async (req, res) => {
     );
     const data = await response.json();
     if (data.error) {
-      return res.status(400).json({ error: data.error.message });
+      // Do not leak error details
+      return res.status(400).json({ error: 'Registration failed.' });
     }
-    res.json({ message: 'Kayıt başarılı', uid: data.localId });
+    // Email verification gönder
+    if (data.idToken) {
+      await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: data.idToken })
+        }
+      );
+    }
+    res.json({ message: 'Registration successful. Please check your email to verify your account.' });
   } catch (err) {
     res.status(500).json({ error: 'Register failed.' });
   }

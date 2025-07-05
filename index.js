@@ -1,6 +1,6 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
-// const deleteExpiredUrls = require('./deleteExpiredUrls');
+const cors = require('cors');
 const urlRoutes = require('./routes');
 const authRoutes = require('./authRoutes');
 const path = require('path');
@@ -9,16 +9,31 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 
-// Statik dosyalar için middleware
+// CORS only allow your own domain (adjust origin as needed)
+app.use(cors({
+  origin: ["http://localhost:3000"],
+  methods: ["GET", "POST", "DELETE"],
+  credentials: true
+}));
+
+// Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rate limiting middleware
-const limiter = rateLimit({
+// Rate limiting for all auth endpoints
+const authLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 1, // Maximum 1 request
-  message: "You can only make one request per minute."
+  max: 5, // Max 5 requests per minute
+  message: { error: "Too many requests, please try again later." }
 });
-app.use('/shorten', limiter);
+app.use(['/register', '/login'], authLimiter);
+
+// Rate limiting for shorten endpoint
+const shortenLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: { error: "Too many requests, please try again later." }
+});
+app.use('/shorten', shortenLimiter);
 
 // Use routes
 app.use('/', urlRoutes);

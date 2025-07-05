@@ -23,6 +23,24 @@ const login = async (req, res) => {
     if (data.error) {
       return res.status(401).json({ error: data.error.message });
     }
+    // Email doğrulama kontrolü (accounts:lookup ile)
+    if (data.idToken) {
+      const lookupRes = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idToken: data.idToken })
+        }
+      );
+      const lookupData = await lookupRes.json();
+      if (
+        !lookupData.users ||
+        !lookupData.users[0] ||
+        lookupData.users[0].emailVerified !== true
+      ) {
+        return res.status(403).json({ error: 'Please verify your email address before logging in.' });
+      }
+    }
     // Giriş başarılı, idToken döndür
     res.json({ idToken: data.idToken, refreshToken: data.refreshToken, expiresIn: data.expiresIn });
   } catch (err) {
