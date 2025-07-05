@@ -65,7 +65,7 @@ authForm.addEventListener('submit', async function(e) {
       const data = await res.json();
       if (res.ok) {
         messageDiv.style.color = 'green';
-        messageDiv.textContent = 'Sign up successful! You can now sign in.';
+        messageDiv.textContent = 'Sign up successful! Please check your email to verify your account.';
         setTimeout(() => {
           isLogin = true;
           formTitle.textContent = 'Sign In';
@@ -73,7 +73,7 @@ authForm.addEventListener('submit', async function(e) {
           toggleAuth.textContent = "Don't have an account? Sign Up";
           document.getElementById('password').setAttribute('autocomplete', 'current-password');
           messageDiv.textContent = '';
-        }, 1200);
+        }, 2500);
       } else {
         messageDiv.style.color = 'red';
         messageDiv.textContent = data.error || 'Sign up failed!';
