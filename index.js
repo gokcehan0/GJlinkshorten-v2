@@ -6,8 +6,9 @@ const authRoutes = require('./authRoutes');
 const path = require('path');
 require('dotenv').config();
 
+
 const app = express();
-app.set('trust proxy', true);
+app.set('trust proxy', 1); // Güvenli proxy ayarı, Render için önerilir
 app.use(express.json());
 
 // CORS only allow your own domain (adjust origin as needed)
@@ -20,19 +21,26 @@ app.use(cors({
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+
 // Rate limiting for all auth endpoints
 const authLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 5, // Max 5 requests per minute
-  message: { error: "Too many requests, please try again later." }
+  windowMs: 5 * 1000, // 5 saniye
+  max: 5, // 5 saniyede en fazla 5 istek
+  message: { error: "Too many requests, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip
 });
 app.use(['/register', '/login'], authLimiter);
 
 // Rate limiting for shorten endpoint
 const shortenLimiter = rateLimit({
-  windowMs: 60 * 1000,
+  windowMs: 5 * 1000, // 5 saniye
   max: 10,
-  message: { error: "Too many requests, please try again later." }
+  message: { error: "Too many requests, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip
 });
 app.use('/shorten', shortenLimiter);
 
