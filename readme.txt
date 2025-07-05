@@ -1,1 +1,1 @@
-email doğrulaması ekledik
+
