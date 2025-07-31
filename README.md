@@ -32,16 +32,16 @@ All authentication logic is handled in the backend and integrated with the front
 
 Below you can see some example screenshots of the application:
 
-### Home Page
+### Login Page
 ![Home](img/ss1.png)
 
-### Auth Page
+### Main Page
 ![Auth](img/ss2.png)
 
-### URL List
+### Short URL 
 ![List](img/ss3.png)
 
-### Success Message
+### Url List
 ![Success](img/ss4.png)
 
 ## 📂 Project Structure
